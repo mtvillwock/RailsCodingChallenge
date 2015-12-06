@@ -3,14 +3,15 @@ class Cuboid
   attr_accessor :x, :y, :z
   attr_reader :length, :width, :height
 
-  def initialize(x , y, z, length, width, height)
-    # todo: refactor to use hash as configuration for intialization
-    @x = x
-    @y = y
-    @z = z
-    @length = length
-    @width = width
-    @height = height
+  def initialize(args)
+    # Origin Vertex
+    @x = args[:x] || 0
+    @y = args[:y] || 0
+    @z = args[:z] || 0
+    # Dimensions of Cuboid
+    @length = args[:length]
+    @width = args[:width]
+    @height = args[:height]
   end
 
   #BEGIN public methods that should be your starting point
@@ -19,13 +20,6 @@ class Cuboid
     @x = x
     @y = y
     @z = z
-  end
-
-  def edges
-    # find range between two points in 3D space
-    # square root of the sum of the square of each of x1 - x2, y1-y2, z1-z2
-    # distance = Math.sqrt(point_a ** 2 + point_b ** 2 + point_c ** 2)
-    #
   end
 
   def vertices
@@ -47,16 +41,41 @@ class Cuboid
     g = [@x + @width, @y, @z + @length] # bottom, right, back
 
     known_vertices = [origin, b, c, d, e, f, g, diagonal_vertex]
-    p known_vertices.uniq == known_vertices
     puts "known_vertices are #{known_vertices}"
+    known_vertices
   end
 
   #returns true if the two cuboids intersect each other.  False otherwise.
-  def intersects?(other)
+  def intersects?(other_cuboid)
+    # given vertices of two cuboids, compare the distance between each pair of points
+    # if any of the distances are negative, return true
+    # else return false
+    current_vertices = self.vertices
+    other_cuboid.vertices.each do |other_vertex|
+      p other_vertex
+      # if x, y, and z value is greater than origin vertex and less than diagonal vertex
+      if other_vertex[0] > current_vertices[0][0] && other_vertex[0] < current_vertices[-1][0] &&
+          other_vertex[1] > current_vertices[0][1] && other_vertex[1] < current_vertices[-1][1] &&
+          other_vertex[2] > current_vertices[0][2] && other_vertex[2] < current_vertices[-1][2]
+        return true
+      end
+    end
+    return false
   end
 
   #END public methods that should be your starting point
 end
 
-c = Cuboid.new(0, 0, 0, 2, 3, 4)
+cuboid_hash = { x: 2, y: 3, z: 4, width: 3, height: 4, length: 5 }
+c = Cuboid.new(cuboid_hash)
 c.vertices
+
+cuboid_hash2 = { x: 3, y: 1, z: 2, width: 4, height: 2, length: 3 }
+c2 = Cuboid.new(cuboid_hash2)
+c.vertices
+
+p c.intersects?(c2)
+
+c3 = Cuboid.new({ x: 1, y:1, z: 1, width: 2, height: 2, length: 2})
+c4 = Cuboid.new({ x: 2, y:2, z: 2, width: 2, height: 2, length: 2})
+p c4.intersects?(c3)
