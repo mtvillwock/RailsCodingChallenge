@@ -42,19 +42,12 @@ class Cuboid
 
   #returns true if the two cuboids intersect each other.  False otherwise.
   def intersects?(other_cuboid)
-    # given vertices of two cuboids, compare the distance between each pair of points
-    # if any of the distances are negative, return true
-    # else return false
     anti_origin = self.vertices[-1]
-    p "Current cuboid has origin #{@origin.x}, #{@origin.y}, #{@origin.z} and anti_origin of #{anti_origin.x}, #{anti_origin.y}, #{anti_origin.z}"
     other_cuboid.vertices.each do |other_vertex|
       # if x, y, and z value is greater than origin vertex and less than diagonal vertex
-      p <<-CUBOID
-      #{other_vertex} has X = #{other_vertex.x}      #{other_vertex} has y = #{other_vertex.y}      #{other_vertex} has z = #{other_vertex.z}
-      CUBOID
-      if other_vertex.x > @origin.x && other_vertex.x < anti_origin.x &&
-          other_vertex.y > @origin.y && other_vertex.y < anti_origin.y &&
-          other_vertex.z > @origin.z && other_vertex.z < anti_origin.z
+      if other_vertex.x >= @origin.x && other_vertex.x <= anti_origin.x &&
+          other_vertex.y >= @origin.y && other_vertex.y <= anti_origin.y &&
+          other_vertex.z >= @origin.z && other_vertex.z <= anti_origin.z
         return true
       end
     end
