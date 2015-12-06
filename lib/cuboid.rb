@@ -1,10 +1,10 @@
 class Point
   attr_accessor :x, :y, :z
 
-  def initialize(dimensions)
-    @x = dimensions[:x]
-    @y = dimensions[:y]
-    @z = dimensions[:z]
+  def initialize(coordinates)
+    @x = coordinates[:x]
+    @y = coordinates[:y]
+    @z = coordinates[:z]
   end
 end
 
@@ -26,6 +26,7 @@ class Cuboid
   def move_to!(x, y, z)
     @origin = Point.new({x: x, y: y, z: z})
     set_vertices
+    @origin
   end
 
   def set_vertices
@@ -44,14 +45,16 @@ class Cuboid
     # given vertices of two cuboids, compare the distance between each pair of points
     # if any of the distances are negative, return true
     # else return false
-    current_vertices = self.vertices
-    p current_vertices[-1]
-    p other_cuboid.vertices[-1]
+    anti_origin = self.vertices[-1]
+    p "Current cuboid has origin #{@origin.x}, #{@origin.y}, #{@origin.z} and anti_origin of #{anti_origin.x}, #{anti_origin.y}, #{anti_origin.z}"
     other_cuboid.vertices.each do |other_vertex|
       # if x, y, and z value is greater than origin vertex and less than diagonal vertex
-      if other_vertex.x > current_vertices[0].x && other_vertex.x < current_vertices[-1].x &&
-          other_vertex.y > current_vertices[0].y && other_vertex.y < current_vertices[-1].y &&
-          other_vertex.z > current_vertices[0].z && other_vertex.z < current_vertices[-1].z
+      p <<-CUBOID
+      #{other_vertex} has X = #{other_vertex.x}      #{other_vertex} has y = #{other_vertex.y}      #{other_vertex} has z = #{other_vertex.z}
+      CUBOID
+      if other_vertex.x > @origin.x && other_vertex.x < anti_origin.x &&
+          other_vertex.y > @origin.y && other_vertex.y < anti_origin.y &&
+          other_vertex.z > @origin.z && other_vertex.z < anti_origin.z
         return true
       end
     end
@@ -63,15 +66,15 @@ end
 
 origin = Point.new({x: 1, y: 1, z: 1})
 cuboid = Cuboid.new({origin: origin, length: 3, height: 2, width: 4})
-p cuboid.vertices
+# p cuboid.vertices
 
 origin2 = Point.new({x: 3, y: 2, z: 2})
 cuboid2 = Cuboid.new({origin: origin2, length: 1, height: 1, width: 1})
 
 p cuboid.intersects?(cuboid2)
-# true
+# # true
 
-origin3 = Point.new({x: 7, y: 7, z: 7})
-cuboid3 = Cuboid.new({origin: origin3, length: 1, height: 1, width: 1})
+# origin3 = Point.new({x: 7, y: 7, z: 7})
+# cuboid3 = Cuboid.new({origin: origin3, length: 1, height: 1, width: 1})
 
-p cuboid.intersects?(cuboid3)
+# p cuboid.intersects?(cuboid3)
