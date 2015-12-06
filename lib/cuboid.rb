@@ -52,7 +52,6 @@ class Cuboid
     # else return false
     current_vertices = self.vertices
     other_cuboid.vertices.each do |other_vertex|
-      p other_vertex
       # if x, y, and z value is greater than origin vertex and less than diagonal vertex
       if other_vertex[0] > current_vertices[0][0] && other_vertex[0] < current_vertices[-1][0] &&
           other_vertex[1] > current_vertices[0][1] && other_vertex[1] < current_vertices[-1][1] &&
