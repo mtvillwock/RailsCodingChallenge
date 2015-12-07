@@ -1,53 +1,65 @@
+class Point
+  attr_accessor :x, :y, :z
+
+  def initialize(coordinates)
+    @x = coordinates[:x]
+    @y = coordinates[:y]
+    @z = coordinates[:z]
+  end
+end
+
 
 class Cuboid
-  attr_accessor :x, :y, :z
-  attr_reader :length, :width, :height
+  attr_reader :origin, :vertices, :length, :width, :height
 
-  def initialize(args)
-    # Origin Vertex
-    @x = args[:x] || 0
-    @y = args[:y] || 0
-    @z = args[:z] || 0
-    # Dimensions of Cuboid
-    @length = args[:length]
-    @width = args[:width]
-    @height = args[:height]
+  def initialize(dimensions)
+    @origin = dimensions[:origin] #bottom, left, front vertex
+    @vertices = []
+    @length = dimensions[:length]
+    @width = dimensions[:width]
+    @height = dimensions[:height]
+    set_vertices
   end
 
   #BEGIN public methods that should be your starting point
 
   def move_to!(x, y, z)
-    @x = x
-    @y = y
-    @z = z
-    [@x, @y, @z]
+    @origin = Point.new({x: x, y: y, z: z})
+    set_vertices
+    @origin
   end
 
-  def vertices
-    origin = [@x, @y, @z] # bottom, left, front
-    diagonal_vertex = [@x + @width, @y + @height, @z + @length] # top, right, back
+  def set_vertices
+    anti_origin = Point.new({ x: @origin.x + @width, y: @origin.y + @height, z: @origin.z + @length }) # top, right, back
+    b = Point.new({ x: @origin.x + @width, y: @origin.y, z: @origin.z }) # bottom, right, front
+    c = Point.new({ x: @origin.x, y: @origin.y, z: @origin.z + @length }) # bottom, left, back
+    d = Point.new({ x: @origin.x, y: @origin.y + @height, z: @origin.z }) # top, left, front
+    e = Point.new({ x: @origin.x, y: @origin.y + @height, z: @origin.z + @length }) # top, left, back
+    f = Point.new({ x: @origin.x + @width, y: @origin.y + @height, z: @origin.z }) #top, right, front
+    g = Point.new({ x: @origin.x + @width, y: @origin.y, z: @origin.z + @length }) # bottom, right, back
+    @vertices = [@origin, b, c, d, e, f, g, anti_origin]
+  end
 
-    b = [@x + @width, @y, @z] # bottom, right, front
-    c = [@x, @y, @z + @length] # bottom, left, back
-    d = [@x, @y + @height, @z] # top, left, front
-    e = [@x, @y + @height, @z + @length] # top, left, back
-    f = [@x + @width + @y + height , @z] #top, right, front
-    g = [@x + @width, @y, @z + @length] # bottom, right, back
+  def contains?(point)
+    anti_origin = self.vertices[-1]
+    return false if point.x < @origin.x || point.x > anti_origin.x
+    return false if point.y < @origin.y || point.y > anti_origin.y
+    return false if point.z < @origin.z || point.z > anti_origin.z
+    return true
+  end
 
-    known_vertices = [origin, b, c, d, e, f, g, diagonal_vertex]
+  def touches?(point)
+    anti_origin = self.vertices[-1]
+    return true if point.x == @origin.x || point.x == anti_origin.x
+    return true if point.y == @origin.y || point.y == anti_origin.y
+    return true if point.z == @origin.z || point.z == anti_origin.z
+    return false
   end
 
   #returns true if the two cuboids intersect each other.  False otherwise.
-  def intersects?(other_cuboid)
-    # given vertices of two cuboids, compare the distance between each pair of points
-    # if any of the distances are negative, return true
-    # else return false
-    current_vertices = self.vertices
-    other_cuboid.vertices.each do |other_vertex|
-      # if x, y, and z value is greater than origin vertex and less than diagonal vertex
-      if other_vertex[0] > current_vertices[0][0] && other_vertex[0] < current_vertices[-1][0] &&
-          other_vertex[1] > current_vertices[0][1] && other_vertex[1] < current_vertices[-1][1] &&
-          other_vertex[2] > current_vertices[0][2] && other_vertex[2] < current_vertices[-1][2]
+  def intersects?(cuboid)
+    cuboid.vertices.each do |vertex|
+      if self.contains?(vertex) || self.touches?(vertex)
         return true
       end
     end
