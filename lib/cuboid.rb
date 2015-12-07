@@ -40,14 +40,26 @@ class Cuboid
     @vertices = [@origin, b, c, d, e, f, g, anti_origin]
   end
 
-  #returns true if the two cuboids intersect each other.  False otherwise.
-  def intersects?(other_cuboid)
+  def contains?(point)
     anti_origin = self.vertices[-1]
-    other_cuboid.vertices.each do |other_vertex|
-      # if x, y, and z value is greater than origin vertex and less than diagonal vertex
-      if other_vertex.x >= @origin.x && other_vertex.x <= anti_origin.x &&
-          other_vertex.y >= @origin.y && other_vertex.y <= anti_origin.y &&
-          other_vertex.z >= @origin.z && other_vertex.z <= anti_origin.z
+    return false if point.x < @origin.x || point.x > anti_origin.x
+    return false if point.y < @origin.y || point.y > anti_origin.y
+    return false if point.z < @origin.z || point.z > anti_origin.z
+    return true
+  end
+
+  def touches?(point)
+    anti_origin = self.vertices[-1]
+    return true if point.x == @origin.x || point.x == anti_origin.x
+    return true if point.y == @origin.y || point.y == anti_origin.y
+    return true if point.z == @origin.z || point.z == anti_origin.z
+    return false
+  end
+
+  #returns true if the two cuboids intersect each other.  False otherwise.
+  def intersects?(cuboid)
+    cuboid.vertices.each do |vertex|
+      if self.contains?(vertex) || self.touches?(vertex)
         return true
       end
     end
@@ -56,18 +68,3 @@ class Cuboid
 
   #END public methods that should be your starting point
 end
-
-origin = Point.new({x: 1, y: 1, z: 1})
-cuboid = Cuboid.new({origin: origin, length: 3, height: 2, width: 4})
-# p cuboid.vertices
-
-origin2 = Point.new({x: 3, y: 2, z: 2})
-cuboid2 = Cuboid.new({origin: origin2, length: 1, height: 1, width: 1})
-
-p cuboid.intersects?(cuboid2)
-# # true
-
-# origin3 = Point.new({x: 7, y: 7, z: 7})
-# cuboid3 = Cuboid.new({origin: origin3, length: 1, height: 1, width: 1})
-
-# p cuboid.intersects?(cuboid3)
